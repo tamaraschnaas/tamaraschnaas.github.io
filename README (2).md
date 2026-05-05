@@ -1,4 +1,4 @@
-# Tamara Terroba Schnaas — Personal Site
+git add# Tamara Terroba Schnaas — Personal Site
 
 Tarjeta personal en la web. Estática, sin frameworks, sin build step.
 
