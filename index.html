@@ -208,6 +208,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     syncAboutTextFromI18n();
+    // Bundled render can overwrite text after this script runs; retry briefly.
+    [50, 150, 300, 600, 1200, 2000].forEach((ms) => {
+      setTimeout(syncAboutTextFromI18n, ms);
+    });
     const langToggle = document.getElementById('lang-toggle');
     if (langToggle) langToggle.addEventListener('click', () => setTimeout(syncAboutTextFromI18n, 0));
   } catch (err) {
