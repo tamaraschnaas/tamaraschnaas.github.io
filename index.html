@@ -187,6 +187,24 @@ document.addEventListener('DOMContentLoaded', async function() {
       });
       if (paragraphs[0]) paragraphs[0].textContent = dict[lang]['about.p1'] || paragraphs[0].textContent;
       if (paragraphs[1]) paragraphs[1].textContent = dict[lang]['about.p2'] || paragraphs[1].textContent;
+
+      // Fallback for fully static bundled markup where section lookup fails.
+      const textP1Es = 'Soy estudiante de Ciencia de Datos en el ITAM';
+      const textP2Es = 'Acabo de regresar de un semestre de intercambio';
+      const textP1En = "I'm a Data Science undergraduate at ITAM";
+      const textP2En = 'I just got back from an exchange semester';
+      Array.from(document.querySelectorAll('p')).forEach((p) => {
+        const txt = (p.textContent || '').trim();
+        if (
+          txt.includes(textP1Es) ||
+          txt.includes(textP2Es) ||
+          txt.includes(textP1En) ||
+          txt.includes(textP2En)
+        ) {
+          if (txt.includes(textP1Es) || txt.includes(textP1En)) p.textContent = dict[lang]['about.p1'] || txt;
+          if (txt.includes(textP2Es) || txt.includes(textP2En)) p.textContent = dict[lang]['about.p2'] || txt;
+        }
+      });
     }
 
     syncAboutTextFromI18n();
