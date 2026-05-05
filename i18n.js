@@ -70,7 +70,7 @@ window.I18N = {
     "int.4": "Tecnología",
     "int.5": "Entornos internacionales",
     "int.6": "Idiomas",
-    "int.7": "Preguntas bien formuladas",
+    "int.7": "Aprendizaje continuo",
 
     "ctc.title": "Contacto",
     "ctc.kicker": "— para hablar",
@@ -151,7 +151,7 @@ window.I18N = {
     "int.4": "Technology",
     "int.5": "International environments",
     "int.6": "Languages",
-    "int.7": "Well-posed questions",
+    "int.7": "Continuous learning",
 
     "ctc.title": "Contact",
     "ctc.kicker": "— to talk",
