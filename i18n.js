@@ -11,7 +11,7 @@ window.I18N = {
     "about.title": "Sobre",
     "about.kicker": "— qué hago, por qué",
     "about.p1": "Soy estudiante de Ciencia de Datos en el ITAM, con experiencia en análisis logístico, dashboards de business intelligence y limpieza de datos a gran escala. Me interesa el punto donde los datos dejan de ser una hoja de cálculo y se vuelven una decisión.",
-    "about.p2": "Acabo de regresar de un semestre de intercambio en WU Vienna, donde estudié business analytics y estrategia basada en datos. Hablo cuatro idiomas en distintos niveles. Me gustan los entornos internacionales y los retos que me desafían.",
+    "about.p2": "Acabo de regresar de un semestre de intercambio en WU Vienna, donde estudié business analytics y estrategia basada en datos. Hablo cuatro idiomas en distintos niveles de confianza. Me gustan los entornos internacionales y los retos que me desafían.",
 
     "edu.title": "Educación",
     "edu.kicker": "— dónde he estudiado",
