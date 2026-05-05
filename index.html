@@ -193,6 +193,18 @@ document.addEventListener('DOMContentLoaded', async function() {
           paragraphs[1].textContent;
       }
 
+      // Keep both "Sobre" paragraphs with identical typography.
+      if (paragraphs.length >= 2) {
+        const base = window.getComputedStyle(paragraphs[0]);
+        paragraphs.slice(0, 2).forEach((p) => {
+          p.style.fontFamily = base.fontFamily;
+          p.style.fontSize = base.fontSize;
+          p.style.fontWeight = base.fontWeight;
+          p.style.lineHeight = base.lineHeight;
+          p.style.letterSpacing = base.letterSpacing;
+        });
+      }
+
       // Fallback for fully static bundled markup where section lookup fails.
       const textP1Es = 'Soy estudiante de Ciencia de Datos en el ITAM';
       const textP2Es = 'Acabo de regresar de un semestre de intercambio';
