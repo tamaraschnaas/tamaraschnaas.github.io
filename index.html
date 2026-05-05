@@ -253,19 +253,21 @@ document.addEventListener('DOMContentLoaded', async function() {
       const wantedEs = dict.es['int.7'] || 'Aprendizaje continuo';
       const staleEn = 'Well-posed questions';
       const wantedEn = dict.en['int.7'] || 'Continuous learning';
-      const stale = lang === 'es' ? staleEs : staleEn;
-      const wanted = lang === 'es' ? wantedEs : wantedEn;
 
-      const interestsHeading = Array.from(document.querySelectorAll('h2')).find((h2) => {
-        const t = (h2.textContent || '').trim().toLowerCase();
-        return t === 'intereses' || t === 'interests';
-      });
-      const section = interestsHeading ? interestsHeading.closest('section, .block, .container, .wrap') : document;
-      const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT);
+      // Use whole body: bundled markup structure varies and section lookup can fail.
+      const root = document.body || document.documentElement;
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       let node = walker.nextNode();
       while (node) {
         const current = node.nodeValue || '';
-        if (current.includes(stale)) node.nodeValue = current.replaceAll(stale, wanted);
+        let replaced = current
+          .replaceAll(staleEs, wantedEs)
+          .replaceAll(staleEn, wantedEn);
+        // Keep visible language aligned even if both strings coexist in DOM.
+        if (lang === 'es') replaced = replaced.replaceAll(wantedEn, staleEn).replaceAll(staleEn, wantedEn);
+        if (lang === 'en') replaced = replaced.replaceAll(wantedEs, staleEs).replaceAll(staleEs, wantedEs);
+        if (replaced !== current) node.nodeValue = replaced;
         node = walker.nextNode();
       }
     }
