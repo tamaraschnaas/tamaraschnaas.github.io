@@ -243,13 +243,47 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
 
+    // Keep bundled "Intereses" list synced with i18n values.
+    function syncInterestsFromI18n() {
+      const dict = window.I18N;
+      const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+      if (!dict || !dict[lang]) return;
+
+      const staleEs = 'Preguntas bien formuladas';
+      const wantedEs = dict.es['int.7'] || 'Aprendizaje continuo';
+      const staleEn = 'Well-posed questions';
+      const wantedEn = dict.en['int.7'] || 'Continuous learning';
+      const stale = lang === 'es' ? staleEs : staleEn;
+      const wanted = lang === 'es' ? wantedEs : wantedEn;
+
+      const interestsHeading = Array.from(document.querySelectorAll('h2')).find((h2) => {
+        const t = (h2.textContent || '').trim().toLowerCase();
+        return t === 'intereses' || t === 'interests';
+      });
+      const section = interestsHeading ? interestsHeading.closest('section, .block, .container, .wrap') : document;
+      const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT);
+      let node = walker.nextNode();
+      while (node) {
+        const current = node.nodeValue || '';
+        if (current.includes(stale)) node.nodeValue = current.replaceAll(stale, wanted);
+        node = walker.nextNode();
+      }
+    }
+
     syncAboutTextFromI18n();
+    syncInterestsFromI18n();
     // Bundled render can overwrite text after this script runs; retry briefly.
     [50, 150, 300, 600, 1200, 2000].forEach((ms) => {
       setTimeout(syncAboutTextFromI18n, ms);
+      setTimeout(syncInterestsFromI18n, ms);
     });
     const langToggle = document.getElementById('lang-toggle');
-    if (langToggle) langToggle.addEventListener('click', () => setTimeout(syncAboutTextFromI18n, 0));
+    if (langToggle) {
+      langToggle.addEventListener('click', () => {
+        setTimeout(syncAboutTextFromI18n, 0);
+        setTimeout(syncInterestsFromI18n, 0);
+      });
+    }
   } catch (err) {
     setStatus('Error unpacking: ' + err.message);
     console.error('Bundle unpack error:', err);
