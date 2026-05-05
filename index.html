@@ -249,9 +249,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
       if (!dict || !dict[lang]) return;
 
-      const staleEs = 'Innovación con impacto';
+      const staleEs = 'Preguntas bien formuladas';
+      const staleEsAlt = 'Aprendizaje continuo';
       const wantedEs = dict.es['int.7'] || 'Innovación con impacto';
-      const staleEn = 'Impact-driven innovation';
+      const staleEn = 'Well-posed questions';
+      const staleEnAlt = 'Continuous learning';
       const wantedEn = dict.en['int.7'] || 'Impact-driven innovation';
 
       // Use whole body: bundled markup structure varies and section lookup can fail.
@@ -263,6 +265,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         const current = node.nodeValue || '';
         let replaced = current
           .replaceAll(staleEs, wantedEs)
+          .replaceAll(staleEsAlt, wantedEs)
+          .replaceAll(staleEnAlt, wantedEn)
           .replaceAll(staleEn, wantedEn);
         // Keep visible language aligned even if both strings coexist in DOM.
         if (lang === 'es') replaced = replaced.replaceAll(wantedEn, staleEn).replaceAll(staleEn, wantedEn);
