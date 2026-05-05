@@ -270,6 +270,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (replaced !== current) node.nodeValue = replaced;
         node = walker.nextNode();
       }
+
+      // Directly patch the 7th interest item in the Interests section.
+      const interestHeading = Array.from(document.querySelectorAll('h2')).find((h2) => {
+        const t = (h2.textContent || '').trim().toLowerCase();
+        return t === 'intereses' || t === 'interests';
+      });
+      if (interestHeading) {
+        const container = interestHeading.closest('section, .block, .container, .wrap') || document;
+        const interestItems = Array.from(container.querySelectorAll('li'));
+        const desired = lang === 'es' ? wantedEs : wantedEn;
+        if (interestItems.length >= 7) {
+          interestItems[6].textContent = desired;
+        } else {
+          // Fallback for non-list markup: patch element whose text is old/new int.7.
+          const candidates = Array.from(container.querySelectorAll('*'));
+          candidates.forEach((el) => {
+            const txt = (el.textContent || '').trim();
+            if (txt === staleEs || txt === staleEn || txt === wantedEs || txt === wantedEn) {
+              el.textContent = desired;
+            }
+          });
+        }
+      }
     }
 
     syncAboutTextFromI18n();
