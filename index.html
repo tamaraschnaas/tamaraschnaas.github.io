@@ -261,7 +261,12 @@ document.addEventListener('DOMContentLoaded', async function() {
       let node = walker.nextNode();
       while (node) {
         const current = node.nodeValue || '';
-        let replaced = current.replaceAll(staleEs, wantedEs).replaceAll(staleEn, wantedEn);
+        let replaced = current
+          .replaceAll(staleEs, wantedEs)
+          .replaceAll(staleEn, wantedEn);
+        // Keep visible language aligned even if both strings coexist in DOM.
+        if (lang === 'es') replaced = replaced.replaceAll(wantedEn, staleEn).replaceAll(staleEn, wantedEn);
+        if (lang === 'en') replaced = replaced.replaceAll(wantedEs, staleEs).replaceAll(staleEs, wantedEs);
         if (replaced !== current) node.nodeValue = replaced;
         node = walker.nextNode();
       }
@@ -290,19 +295,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
 
-    function installInterestsObserver() {
-      const root = document.body || document.documentElement;
-      if (!root || root.__int7ObserverInstalled) return;
-      root.__int7ObserverInstalled = true;
-      const obs = new MutationObserver(() => syncInterestsFromI18n());
-      obs.observe(root, { childList: true, subtree: true, characterData: true });
-      // Keep a reference only to avoid GC in some engines.
-      window.__int7Observer = obs;
-    }
-
     syncAboutTextFromI18n();
     syncInterestsFromI18n();
-    installInterestsObserver();
     // Bundled render can overwrite text after this script runs; retry briefly.
     [50, 150, 300, 600, 1200, 2000].forEach((ms) => {
       setTimeout(syncAboutTextFromI18n, ms);
