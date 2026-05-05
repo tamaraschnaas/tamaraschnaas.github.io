@@ -159,6 +159,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
       window.Babel.transformScriptTags();
     }
+
+    // The bundled template still contains an archived VSP project card.
+    // Remove it at runtime so the published page matches current i18n content.
+    const archivedCard = Array.from(document.querySelectorAll('.card')).find((card) => {
+      const txt = card.textContent || '';
+      return /(?:Optimización Logística|Logistics Optimization|—\s*VSP|\bVSP\b)/i.test(txt);
+    });
+    if (archivedCard) archivedCard.remove();
   } catch (err) {
     setStatus('Error unpacking: ' + err.message);
     console.error('Bundle unpack error:', err);
