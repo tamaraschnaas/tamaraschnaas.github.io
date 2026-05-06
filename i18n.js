@@ -79,7 +79,7 @@ window.I18N = {
     "ctc.copy.val": "vCard al portapapeles",
     “ctc.closing”: “”El CV es el resumen. La persona es más interesante.””,
 
-    "foot.built": "CONSTRUIDO A MANO · HTML · CSS · JS",
+    "foot.built": "CONSTRUIDO EN HTML · CSS · JS",
 
     "toast.copied": "VCARD COPIADA AL PORTAPAPELES"
   },
@@ -160,7 +160,7 @@ window.I18N = {
     "ctc.copy.val": "vCard to clipboard",
     “ctc.closing”: ““The CV is the summary. The person is more interesting.””,
 
-    "foot.built": "HAND-BUILT · HTML · CSS · JS",
+    "foot.built": "BUILT IN HTML · CSS · JS",
 
     "toast.copied": "VCARD COPIED TO CLIPBOARD"
   }
