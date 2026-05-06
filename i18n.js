@@ -77,7 +77,7 @@ window.I18N = {
     "ctc.phone": "TELÉFONO",
     "ctc.copy": "COPIAR TARJETA",
     "ctc.copy.val": "vCard al portapapeles",
-    "ctc.closing": "“La página termina aquí. Las conversaciones, idealmente, no.”",
+    “ctc.closing”: “”El CV es el resumen. La persona es más interesante.””,
 
     "foot.built": "CONSTRUIDO A MANO · HTML · CSS · JS",
 
@@ -158,7 +158,7 @@ window.I18N = {
     "ctc.phone": "PHONE",
     "ctc.copy": "COPY CARD",
     "ctc.copy.val": "vCard to clipboard",
-    "ctc.closing": "“The page ends here. The conversations, ideally, don't.”",
+    “ctc.closing”: ““The CV is the summary. The person is more interesting.””,
 
     "foot.built": "HAND-BUILT · HTML · CSS · JS",
 
