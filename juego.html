@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Tamara Terroba Schnaas</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:ital,wght@0,400;0,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0b09;--text:#e8e0d2;--muted:#8a7f6a;
+  --border:rgba(255,255,255,0.07);
+  --acc:#c9682a;
+  --ff-m:'Space Mono',monospace;
+  --ff-p:'Press Start 2P',monospace;
+  --ff-s:'Cormorant Garamond',Georgia,serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--ff-m);overflow:hidden}
+#app{display:grid;grid-template-columns:1fr 310px;height:100vh;max-width:1100px;margin:0 auto;border:1px solid var(--border);border-top:none}
+#gw{position:relative;overflow:hidden;background:#000}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated;cursor:none}
+
+/* PANEL */
+#panel{border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:#0a0908}
+#ptop{padding:.8rem 1rem .5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.dot{width:9px;height:9px;border-radius:50%}.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+#pzone{flex:1;text-align:center;font-family:var(--ff-p);font-size:6.5px;color:var(--muted);letter-spacing:.1em}
+#pbody{flex:1;overflow-y:auto;padding:1rem;font-size:11px;line-height:1.85;color:var(--muted)}
+#pbody::-webkit-scrollbar{width:3px}
+#pbody::-webkit-scrollbar-thumb{background:var(--acc)}
+.ptitle{font-family:var(--ff-s);font-size:1.8rem;font-weight:300;font-style:italic;color:var(--text);line-height:1.1;margin-bottom:.65rem;opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+.ptag{font-family:var(--ff-p);font-size:6.5px;letter-spacing:.15em;color:var(--acc);text-transform:uppercase;margin-bottom:.45rem;opacity:0;transition:opacity .4s .1s}
+.pbody{opacity:0;transform:translateY(6px);transition:opacity .5s .2s,transform .5s .2s}
+.pv .ptitle,.pv .ptag,.pv .pbody{opacity:1;transform:none}
+.pi{margin-bottom:.6rem;padding:.55rem .75rem;border:1px solid var(--border)}
+.pin{color:var(--text);font-size:11px;margin-bottom:.2rem}
+.pid{color:var(--muted);font-size:10px;line-height:1.7}
+.phint{margin-top:.9rem;padding:.45rem .65rem;border:1px dashed rgba(201,104,42,.28);font-family:var(--ff-p);font-size:5.5px;color:rgba(201,104,42,.5);letter-spacing:.08em;line-height:1.9}
+.pl{display:inline-block;margin:.45rem .3rem 0 0;padding:.3rem .7rem;border:1px solid var(--border);color:var(--muted);font-size:10px;text-decoration:none;transition:border-color .2s,color .2s}
+.pl:hover{border-color:var(--acc);color:var(--acc)}
+.pem{color:var(--text)}
+.psc{font-family:var(--ff-p);font-size:7px;color:var(--acc);padding:.35rem 0}
+.chips{margin-top:.4rem;display:flex;flex-wrap:wrap;gap:.3rem}
+.chip{font-size:9px;padding:.18rem .5rem;border:1px solid var(--border);color:var(--muted)}
+.chip.h{border-color:rgba(201,104,42,.4);color:var(--acc)}
+.pq{font-family:var(--ff-s);font-size:1.15rem;font-style:italic;color:var(--text);line-height:1.5;margin-top:.8rem;padding-left:.75rem;border-left:2px solid var(--acc)}
+.pbullet{padding-left:.75rem;border-left:1px solid var(--border);margin-bottom:.45rem;font-size:10px;line-height:1.75;color:var(--muted)}
+.pbullet .a{color:var(--acc);margin-right:.3rem}
+.date-label{font-family:var(--ff-p);font-size:6px;color:var(--muted);letter-spacing:.08em;margin-bottom:.25rem}
+
+/* START SCREEN */
+#ss{position:absolute;inset:0;background:rgba(12,11,9,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;z-index:50;transition:opacity .6s}
+#ss.hidden{opacity:0;pointer-events:none}
+.ss-loc{font-size:9px;color:var(--muted);font-family:var(--ff-m);letter-spacing:.18em}
+.ss-name{font-family:var(--ff-s);font-size:3rem;font-style:italic;font-weight:300;color:var(--text);text-align:center;line-height:1}
+.ss-role{font-family:var(--ff-p);font-size:6.5px;color:var(--muted);letter-spacing:.15em;text-align:center}
+.ss-stmt{font-family:var(--ff-s);font-size:1.1rem;font-style:italic;color:rgba(201,104,42,.8);text-align:center;max-width:380px;line-height:1.5}
+.ss-btn{padding:.65rem 2rem;border:1px solid var(--acc);font-family:var(--ff-p);font-size:8px;color:var(--acc);background:transparent;cursor:pointer;letter-spacing:.1em;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,104,42,.35)}50%{box-shadow:0 0 0 10px rgba(201,104,42,0)}}
+.ss-c{font-size:8px;color:var(--muted);text-align:center;line-height:2.8;letter-spacing:.08em}
+.key{display:inline-block;padding:.1rem .3rem;border:1px solid rgba(255,255,255,.2);font-family:var(--ff-p);font-size:6px;color:var(--text);margin:0 .1rem}
+
+/* HINT */
+#hint{position:absolute;bottom:38px;left:50%;transform:translateX(-50%);font-family:var(--ff-p);font-size:6.5px;letter-spacing:.1em;color:var(--acc);background:rgba(12,11,9,.9);padding:.35rem .85rem;border:1px solid rgba(201,104,42,.3);opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
+#hint.show{opacity:1}
+
+/* MOBILE */
+#mb{display:none;position:absolute;bottom:8px;left:0;right:0;padding:0 12px;justify-content:space-between;z-index:20;pointer-events:none}
+.mbg{display:flex;gap:6px;pointer-events:all}
+.mbb{width:46px;height:46px;background:rgba(201,104,42,.07);border:1px solid rgba(201,104,42,.2);border-radius:4px;font-family:var(--ff-p);font-size:9px;color:var(--acc);display:flex;align-items:center;justify-content:center;user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mbb:active{background:rgba(201,104,42,.18)}
+
+/* SPEED TIP */
+#speed-tip{position:absolute;top:36px;left:50%;transform:translateX(-50%);font-family:var(--ff-p);font-size:5.5px;color:rgba(201,104,42,.4);letter-spacing:.08em;pointer-events:none;opacity:0;transition:opacity 1s}
+#speed-tip.show{opacity:1}
+
+@media(max-width:700px){
+  #app{grid-template-columns:1fr;grid-template-rows:250px 1fr;overflow:hidden}
+  #panel{border-left:none;border-top:1px solid var(--border)}
+  #mb{display:flex}
+  .ss-name{font-size:2rem}
+}
+@media(pointer:coarse){#mb{display:flex}}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="gw">
+  <canvas id="c"></canvas>
+  <div id="ss">
+    <div class="ss-loc">● MX-CDMX &nbsp;·&nbsp; 19.43°N 99.13°W</div>
+    <div class="ss-name">Tamara<br>Terroba Schnaas</div>
+    <div class="ss-role">DATA SCIENCE · ITAM · 2026 / MMXXVI</div>
+    <div class="ss-stmt">"Un CV que se camina, no se lee."</div>
+    <button class="ss-btn" onclick="startGame()">▶ EXPLORAR</button>
+    <div class="ss-c">
+      <span class="key">←</span> <span class="key">→</span> &nbsp;mover &nbsp;&nbsp;
+      <span class="key">↑</span> <span class="key">SPC</span> &nbsp;saltar &nbsp;&nbsp;
+      <span class="key">SHIFT</span> &nbsp;correr &nbsp;&nbsp;
+      <span class="key">E</span> &nbsp;interactuar
+    </div>
+  </div>
+  <div id="hint"></div>
+  <div id="speed-tip">SHIFT = CORRER MÁS RÁPIDO</div>
+  <div id="mb">
+    <div class="mbg"><div class="mbb" id="bl">◀</div><div class="mbb" id="br">▶</div></div>
+    <div class="mbg"><div class="mbb" id="bi">E</div><div class="mbb" id="bj">↑</div></div>
+  </div>
+</div>
+<div id="panel">
+  <div id="ptop">
+    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <div id="pzone">N.° 001 — TARJETA PERSONAL</div>
+  </div>
+  <div id="pbody">
+    <div class="ptag" style="opacity:1">bienvenida</div>
+    <div class="pbody" style="opacity:1">
+      <p style="margin-bottom:.75rem">Camina por el mundo con las flechas. Cada zona es una sección de mi CV.</p>
+      <p>Acércate a objetos y presiona <span style="color:var(--acc);font-family:var(--ff-p);font-size:8px">E</span> para interactuar.</p>
+      <div class="phint">
+        ← → MOVERSE · SHIFT CORRER<br>
+        ↑/SPC SALTAR · DOBLE SALTO OK<br>
+        ◉ TRAMPOLINES = SUPER SALTO<br>
+        E INTERACTUAR CON OBJETOS<br><br>
+        E = INTERACTUAR CON OBJETOS
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   TAMARA TERROBA SCHNAAS — PORTFOLIO INTERACTIVO
+   tamaraschnaas.github.io
+   2026 / MMXXVI
+═══════════════════════════════════════════════════ */
+const C=document.getElementById('c'),ctx=C.getContext('2d');
+const VW=780,VH=420; C.width=VW; C.height=VH;
+const WW=2600,GY=VH-68;
+
+// ═══ ZONES ══════════════════════════════════════════
+const ZONES=[
+  {id:'home',     x:0,    w:520, name:'INICIO',          sky1:'#0c0b09',sky2:'#1a1208',floor:'#221508',acc:'#c9682a'},
+  {id:'about',    x:520,  w:520, name:'SOBRE MÍ + EDUCACIÓN', sky1:'#080d09',sky2:'#0f1a0e',floor:'#0e2010',acc:'#5ab56e'},
+  {id:'exp',      x:1040, w:520, name:'EXPERIENCIA',     sky1:'#06090e',sky2:'#0a1220',floor:'#0a1628',acc:'#4a8fd4'},
+  {id:'projects', x:1560, w:520, name:'PROYECTOS + SKILLS', sky1:'#0d0810',sky2:'#160c1c',floor:'#1e0a28',acc:'#b06cd0'},
+  {id:'contact',  x:2080, w:520, name:'CONTACTO',        sky1:'#120a06',sky2:'#1e1008',floor:'#2a1208',acc:'#c9682a'},
+];
+
+// ═══ PLATFORMS ═══════════════════════════════════════
+// Each zone = staircase: Tier1(~55px) → Tier2(~110px) → Tier3(~162px)
+// Single jump reaches Tier1 from ground, chain-jump to go higher.
+const PLATS=[
+  // HOME — staircase going right/up
+  {x:155,y:GY-55, w:90,h:10},  // T1: step up
+  {x:290,y:GY-108,w:75,h:10},  // T2: jump from T1
+  {x:408,y:GY-162,w:70,h:10},
+
+  {x:572,y:GY-58, w:90,h:10},  // T1: desk/sobre mí
+  {x:712,y:GY-112,w:78,h:10},  // T2: bookshelf/educación
+  {x:860,y:GY-162,w:68,h:10},
+
+  // EXP
+  {x:1120,y:GY-58, w:82,h:10}, // T1: Biblioteca
+  {x:1255,y:GY-112,w:80,h:10}, // T2: VSP (más reciente, más alto)
+  {x:1476,y:GY-162,w:68,h:10},
+
+  // PROJECTS
+  {x:1612,y:GY-58, w:80,h:10}, // T1: Biblioteca project
+  {x:1752,y:GY-112,w:84,h:10}, // T2: Sports Analytics (activo)
+  {x:1912,y:GY-162,w:90,h:10},
+
+  // CONTACT
+  {x:2200,y:GY-62, w:84,h:10}, // T1: GitHub sign
+  {x:2330,y:GY-118,w:78,h:10}, // T2: door (la puerta abierta)
+  {x:2460,y:GY-168,w:68,h:10},
+];
+
+// Spring pads — shortcut para los que ya conocen el mundo
+const SPRINGS=[
+  {x:465, y:GY-8, w:32,h:8},  // HOME — skip to T3
+  {x:662, y:GY-8, w:32,h:8},  // ABOUT — boost to T2/T3
+  {x:1198,y:GY-8, w:32,h:8},  // EXP — boost across gap
+  {x:1846,y:GY-8, w:32,h:8},  // PROJECTS — shortcut up
+  {x:2396,y:GY-8, w:32,h:8},  // CONTACT — shortcut
+];
+
+// Moving platform — zona EXP, conecta T2 con T3
+const movPlat={x:1360,y:GY-162,w:78,h:10,dir:1,minX:1330,maxX:1475,spd:0.9};
+
+// ═══ CONTENT ══════════════════════════════════════════
+
+function zoneHTML(id){
+  return({
+    home:`
+      <div class="ptag">N.° 001 — tarjeta personal · 2026 / MMXXVI</div>
+      <div class="ptitle">Tamara<br>Terroba Schnaas</div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">Rol</div><div class="pid">Data Science · estudiante en ITAM</div></div>
+        <div class="pi"><div class="pin">Ubicación</div><div class="pid">MX-CDMX · 19.43°N 99.13°W</div></div>
+        <div class="pq">"Un CV que se camina, no se lee."</div>
+        <div class="phint">Muévete → para explorar mi historia.</div>
+      </div>`,
+    about:`
+      <div class="ptag">01 — qué hago, por qué · 02 — dónde he estudiado</div>
+      <div class="ptitle">Sobre mí<br>&amp; Educación</div>
+      <div class="pbody">
+        <p style="margin-bottom:.7rem">Soy estudiante de Ciencia de Datos en el <span class="pem">ITAM</span>, con experiencia en análisis logístico, dashboards de BI y limpieza de datos a gran escala.</p>
+        <p style="margin-bottom:.7rem">Me interesa el punto donde los datos dejan de ser una hoja de cálculo y se vuelven una <span class="pem">decisión</span>.</p>
+        <p>Acabo de regresar de un semestre en <span class="pem">WU Vienna</span>. Hablo cuatro idiomas. Me gustan los entornos internacionales y los retos que me desafían.</p>
+        <div class="phint">💻 Computadora → sobre mí<br>📚 Librería → educación completa</div>
+      </div>`,
+    exp:`
+      <div class="ptag">03 — experiencia profesional</div>
+      <div class="ptitle">Experiencia</div>
+      <div class="pbody">
+        <div class="pi" style="border-color:rgba(74,143,212,.3)"><div class="pin">VSP · Soluciones Tecnológicas</div><div class="pid">Data Analyst Jr. · May 2024 – May 2025</div></div>
+        <div class="pi"><div class="pin">Biblioteca Pública José Martí</div><div class="pid">Database Management (Servicio Social) · 2024 – Jul 2025</div></div>
+        <div class="pi"><div class="pin">Christel House de México A.C.</div><div class="pid">IT Assistant · Jun 2022</div></div>
+        <div class="phint">Acércate a cada puerta para leer el detalle de cada rol.</div>
+      </div>`,
+    projects:`
+      <div class="ptag">04 — proyectos · 05 — herramientas · 06 — idiomas</div>
+      <div class="ptitle">Proyectos<br>&amp; Skills</div>
+      <div class="pbody">
+        <div class="pi" style="border-color:rgba(176,108,208,.35)"><div class="pin">P/01 [ACTIVO] — Sports Analytics Lab</div><div class="pid">ITAM · Python · R · Looker · 2025–presente</div></div>
+        <div class="pi"><div class="pin">P/03 [ENTREGADO] — 15,000 registros</div><div class="pid">Biblioteca José Martí · SQL · Data Cleaning · 2024–2025</div></div>
+        <div class="phint">🏟 Edificios → proyectos<br>🛠 Estación → skills, tools e idiomas</div>
+      </div>`,
+    contact:`
+      <div class="ptag">— para hablar</div>
+      <div class="ptitle">Contacto</div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">✉ Email</div><div class="pid">tamaschnaas@gmail.com</div></div>
+        <div class="pi"><div class="pin">🐙 GitHub</div><div class="pid">@tamaraschnaas</div></div>
+        <div class="pi"><div class="pin">📱 Teléfono</div><div class="pid">+52 55 4828 6573</div></div>
+        <a class="pl" href="mailto:tamaschnaas@gmail.com">Escribir →</a>
+        <a class="pl" href="https://github.com/tamaraschnaas" target="_blank">GitHub →</a>
+        <div class="pq">"El CV es el resumen. La persona es más interesante."</div>
+      </div>`,
+  })[id]||'';
+}
+
+function objHTML(id){
+  return({
+    welcome:`
+      <div class="ptag">N.° 001 — tarjeta personal</div>
+      <div class="ptitle">Tamara<br>Terroba Schnaas</div>
+      <div class="pbody">
+        <p style="margin-bottom:.7rem">Soy estudiante de <span class="pem">Ciencia de Datos en el ITAM</span>, con experiencia en análisis logístico, dashboards de BI y limpieza de datos a gran escala.</p>
+        <p style="margin-bottom:.7rem">Me interesa el punto donde los datos dejan de ser una hoja de cálculo y se vuelven <span class="pem">una decisión</span>.</p>
+        <p>Acabo de regresar de un semestre en <span class="pem">WU Vienna</span>. Hablo cuatro idiomas. Me gustan los entornos internacionales y los retos que me desafían.</p>
+        <div class="phint">→ Muévete a la derecha para explorar cada zona.</div>
+      </div>`,
+
+
+    desk_about:`
+      <div class="ptag">01 — sobre mí</div>
+      <div class="ptitle">Quién soy</div>
+      <div class="pbody">
+        <p style="margin-bottom:.7rem">Soy estudiante de <span class="pem">Ciencia de Datos en el ITAM</span>, con experiencia en análisis logístico, dashboards de business intelligence y limpieza de datos a gran escala.</p>
+        <p style="margin-bottom:.7rem">Me interesa el punto donde los datos dejan de ser una hoja de cálculo y se vuelven <span class="pem">una decisión</span>.</p>
+        <p>Acabo de regresar de un semestre de intercambio en <span class="pem">WU Vienna</span>, donde estudié business analytics y estrategia basada en datos. Hablo cuatro idiomas en distintos niveles de confianza. Me gustan los entornos internacionales y los retos que me desafían.</p>
+      </div>`,
+
+    books_edu:`
+      <div class="ptag">02 — dónde he estudiado</div>
+      <div class="ptitle">Educación</div>
+      <div class="pbody">
+        <div class="date-label">2022 — PRESENTE</div>
+        <div class="pi"><div class="pin">Instituto Tecnológico Autónomo de México</div><div class="pid">Licenciatura en Ciencia de Datos · Ciudad de México</div></div>
+        <div class="pbullet"><span class="a">→</span>Machine Learning · Estadística Avanzada · Álgebra Lineal · Bases de Datos · Programación</div>
+        <div class="date-label" style="margin-top:.8rem">OTOÑO 2025</div>
+        <div class="pi"><div class="pin">WU Wien — Vienna University of Economics and Business</div><div class="pid">Semestre de intercambio · Viena, Austria</div></div>
+        <div class="pbullet"><span class="a">→</span>Cursos en inglés sobre Business Analytics y estrategia data-driven.</div>
+        <div class="date-label" style="margin-top:.8rem">OCT 2025 — ENE 2026</div>
+        <div class="pi"><div class="pin">Open German UDS</div><div class="pid">Micro-Degree en Entrepreneurial Finance and Innovation · 5 ECTS</div></div>
+        <div class="pbullet"><span class="a">→</span>Finanzas para startups, estrategia de innovación y gobierno corporativo.</div>
+      </div>`,
+
+
+    exp_vsp:`
+      <div class="ptag">experiencia · may 2024 – may 2025</div>
+      <div class="ptitle">VSP · Soluciones<br><em>Tecnológicas</em></div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">Data Analyst Jr. · Ciudad de México</div></div>
+        <div class="pbullet"><span class="a">→</span>Analicé datos logísticos y de entregas; las optimizaciones propuestas redujeron costos operativos en <span class="pem">15%</span>.</div>
+        <div class="pbullet"><span class="a">→</span>Construí 5+ dashboards de BI traduciendo datasets complejos en decisiones accionables.</div>
+        <div class="pbullet"><span class="a">→</span>Colaboré con equipos cross-funcionales para apoyar estrategias data-driven y mejorar el desempeño operativo.</div>
+        <div class="chips" style="margin-top:.6rem"><span class="chip h">Looker Studio</span><span class="chip h">SQL</span><span class="chip">BI</span><span class="chip">Análisis logístico</span></div>
+      </div>`,
+
+    exp_bib:`
+      <div class="ptag">experiencia · 2024 – jul 2025 · servicio social</div>
+      <div class="ptitle">Biblioteca<br><em>Pública José Martí</em></div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">Database Management · Ciudad de México</div></div>
+        <div class="pbullet"><span class="a">→</span>Lideré la limpieza y estructuración de <span class="pem">15,000+ registros</span>, mejorando precisión 90% y eficiencia de búsqueda 85%.</div>
+        <div class="pbullet"><span class="a">→</span>Diseñé datasets estructurados para mejorar accesibilidad y usabilidad de los usuarios finales.</div>
+        <div class="pbullet"><span class="a">→</span>Apliqué técnicas de organización y validación para apoyar la transformación digital de la institución.</div>
+        <div class="chips" style="margin-top:.6rem"><span class="chip h">SQL</span><span class="chip h">Data Cleaning</span><span class="chip">Estructuración de datos</span></div>
+      </div>`,
+
+    exp_christel:`
+      <div class="ptag">experiencia · jun 2022</div>
+      <div class="ptitle">Christel House<br><em>de México A.C.</em></div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">IT Assistant · Ciudad de México</div></div>
+        <div class="pbullet"><span class="a">→</span>Soporte técnico a estudiantes, manteniendo el sistema operativo durante periodos académicos críticos.</div>
+      </div>`,
+
+
+    proj_sports:`
+      <div class="ptag">P/01 · activo · 2025 — presente</div>
+      <div class="ptitle">Sports Analytics<br><em>Lab — ITAM</em></div>
+      <div class="pbody">
+        <p style="margin-bottom:.7rem">Análisis de desempeño de jugadores y partidos para identificar patrones y drivers de rendimiento.</p>
+        <div class="pbullet"><span class="a">→</span>Visualizaciones y modelos predictivos básicos para apoyar decisiones de coaching y estrategia.</div>
+        <div class="chips" style="margin-top:.7rem"><span class="chip h">Python</span><span class="chip h">R</span><span class="chip h">Looker</span></div>
+      </div>`,
+
+    proj_bib:`
+      <div class="ptag">P/03 · entregado · 2024 – 2025</div>
+      <div class="ptitle">15,000 registros<br><em>Biblioteca José Martí</em></div>
+      <div class="pbody">
+        <p style="margin-bottom:.7rem">Diseño de un esquema de datos limpio y validado para el catálogo público de la biblioteca.</p>
+        <div class="pbullet"><span class="a">→</span><span class="pem">90%</span> de mejora en precisión · <span class="pem">85%</span> en eficiencia de búsqueda.</div>
+        <div class="pbullet"><span class="a">→</span>Servicio social, un año completo.</div>
+        <div class="chips" style="margin-top:.7rem"><span class="chip h">SQL</span><span class="chip h">Data Cleaning</span></div>
+      </div>`,
+
+    skills_all:`
+      <div class="ptag">05 — herramientas · 06 — idiomas</div>
+      <div class="ptitle">Skills &amp;<br><em>Idiomas</em></div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">Lenguajes</div><div class="chips" style="margin-top:.3rem"><span class="chip h">Python</span><span class="chip h">R</span><span class="chip h">SQL</span><span class="chip">Java</span></div></div>
+        <div class="pi"><div class="pin">Tools</div><div class="chips" style="margin-top:.3rem"><span class="chip h">SQL Server</span><span class="chip h">Looker Studio</span><span class="chip">Excel</span></div></div>
+        <div class="pi"><div class="pin">Fortalezas</div><div class="chips" style="margin-top:.3rem"><span class="chip">Análisis de datos</span><span class="chip">Visualización</span><span class="chip">Business Analytics</span><span class="chip">Resolución de problemas</span></div></div>
+        <div class="pi" style="margin-top:.5rem"><div class="pin">Idiomas</div>
+          <div style="margin-top:.45rem;font-size:10px;line-height:2">
+            <div><span class="pem">Español</span> — Nativo</div>
+            <div><span class="pem">English</span> — Avanzado</div>
+            <div><span class="pem">日本語</span> — Intermedio</div>
+            <div><span class="pem">Deutsch</span> — Principiante</div>
+          </div>
+        </div>
+      </div>`,
+
+
+    mailbox:`
+      <div class="ptag">— para hablar</div>
+      <div class="ptitle">Escríbeme</div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">✉ Email</div><div class="pid">tamaschnaas@gmail.com</div></div>
+        <div class="pi"><div class="pin">📱 Teléfono</div><div class="pid">+52 55 4828 6573</div></div>
+        <a class="pl" href="mailto:tamaschnaas@gmail.com">Abrir correo →</a>
+      </div>`,
+
+    gh_sign:`
+      <div class="ptag">— código y proyectos</div>
+      <div class="ptitle">GitHub</div>
+      <div class="pbody">
+        <div class="pi"><div class="pin">@tamaraschnaas</div><div class="pid">Construido en HTML · CSS · JS</div></div>
+        <a class="pl" href="https://github.com/tamaraschnaas" target="_blank">Ver perfil →</a>
+      </div>`,
+
+    door:`
+      <div class="ptag">— la puerta siempre abierta</div>
+      <div class="ptitle"><em>"El CV es el resumen.<br>La persona es más interesante."</em></div>
+      <div class="pbody">
+        <p style="margin-bottom:.7rem">Si llegaste hasta aquí, gracias. Caminaste todo mi mundo.</p>
+        <p>Estoy abierta a <span class="pem">proyectos de datos, análisis, BI y colaboraciones internacionales</span>.</p>
+        <div class="pi" style="margin-top:.75rem"><div class="pin">© 2026 — TAMARA TERROBA SCHNAAS</div><div class="pid">CONSTRUIDO EN HTML · CSS · JS</div></div>
+      </div>`,
+
+  })[id]||'';
+}
+
+// ═══ OBJECTS ════════════════════════════════════════
+const OBJECTS=[
+  // HOME
+  {id:'welcome',     x:65,   y:GY-58,  w:36,h:48, icon:'📋',label:'Leer bienvenida',               zone:'home',     fn:()=>objHTML('welcome')},
+  // ABOUT
+  {id:'desk_about',  x:578,  y:GY-110, w:52,h:52, icon:'💻',label:'Sobre mí',                       zone:'about',    fn:()=>objHTML('desk_about')},
+  {id:'books_edu',   x:720,  y:GY-172, w:46,h:60, icon:'📚',label:'Educación · ITAM · WU Wien',     zone:'about',    fn:()=>objHTML('books_edu')},
+  // EXP
+  {id:'exp_christel',x:1058, y:GY-68,  w:52,h:52, icon:'🖥️',label:'Christel House A.C.',            zone:'exp',      fn:()=>objHTML('exp_christel')},
+  {id:'exp_bib',     x:1128, y:GY-110, w:52,h:52, icon:'📖',label:'Biblioteca Pública José Martí',  zone:'exp',      fn:()=>objHTML('exp_bib')},
+  {id:'exp_vsp',     x:1263, y:GY-164, w:52,h:52, icon:'📊',label:'VSP · Data Analyst Jr.',         zone:'exp',      fn:()=>objHTML('exp_vsp')},
+  // PROJECTS
+  {id:'proj_bib',    x:1620, y:GY-124, w:54,h:66, icon:'📖',label:'15,000 registros — Biblioteca',  zone:'projects', fn:()=>objHTML('proj_bib')},
+  {id:'proj_sports', x:1760, y:GY-178, w:54,h:66, icon:'🏟',label:'Sports Analytics Lab — ITAM',    zone:'projects', fn:()=>objHTML('proj_sports')},
+  {id:'skills_all',  x:1920, y:GY-214, w:52,h:52, icon:'🛠️',label:'Skills · Tools · Idiomas',       zone:'projects', fn:()=>objHTML('skills_all')},
+  // CONTACT
+  {id:'mailbox',     x:2092, y:GY-68,  w:46,h:52, icon:'📬',label:'Buzón de contacto',              zone:'contact',  fn:()=>objHTML('mailbox')},
+  {id:'gh_sign',     x:2208, y:GY-114, w:46,h:52, icon:'🐙',label:'GitHub @tamaraschnaas',          zone:'contact',  fn:()=>objHTML('gh_sign')},
+  {id:'door',        x:2338, y:GY-198, w:46,h:80, icon:'🚪',label:'La puerta siempre abierta',      zone:'contact',  fn:()=>objHTML('door')},
+];
+
+// ═══ PLAYER ══════════════════════════════════════════
+const P={x:55,y:GY-38,vx:0,vy:0,w:14,h:28,onGround:false,facing:1,frame:0,walking:false,jumps:0,sprinting:false,prevVy:0};
+const CAM={x:0};
+const K={};
+let running=false,curZone=null,nearObj=null,tipShown=false;
+
+// Particles
+const PARTS=[];
+function spawnParts(x,y,col,n=10){
+  for(let i=0;i<n;i++){
+    PARTS.push({
+      x,y,
+      vx:(Math.random()-.5)*7,
+      vy:(Math.random()-1.2)*5,
+      life:1,
+      decay:.03+Math.random()*.02,
+      r:Math.random()*3.5+1.5,
+      col,
+      ch:['◈','◇','·','○'][Math.floor(Math.random()*4)]
+    });
+  }
+}
+function spawnDust(x,y){
+  for(let i=0;i<5;i++) PARTS.push({x,y,vx:(Math.random()-.5)*2.5,vy:-Math.random()*1.5,life:.6,decay:.04,r:2,col:'rgba(200,180,150,.4)',ch:'·'});
+}
+
+// ═══ INPUT ════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  K[e.code]=true;
+  if(!running)return;
+  if(e.code==='Space'||e.code==='ArrowUp'){
+    e.preventDefault();
+    if(P.jumps<2){P.vy=P.jumps===1?-9:-10.8;P.onGround=false;P.jumps++;spawnDust(P.x+P.w/2,P.y+P.h);}
+  }
+  if(e.code==='KeyE'&&nearObj)interact(nearObj);
+  if(['ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+  if((e.code==='ShiftLeft'||e.code==='ShiftRight')&&!tipShown){
+    document.getElementById('speed-tip').classList.add('show');
+    setTimeout(()=>document.getElementById('speed-tip').classList.remove('show'),3000);
+    tipShown=true;
+  }
+});
+document.addEventListener('keyup',e=>{delete K[e.code];});
+
+(function(){
+  function hold(el,code){
+    el.addEventListener('touchstart',e=>{e.preventDefault();K[code]=true;},{passive:false});
+    el.addEventListener('touchend',e=>{e.preventDefault();delete K[code];},{passive:false});
+    el.addEventListener('mousedown',()=>K[code]=true);
+    el.addEventListener('mouseup',()=>delete K[code]);
+  }
+  hold(document.getElementById('bl'),'ArrowLeft');
+  hold(document.getElementById('br'),'ArrowRight');
+  const jump=()=>{if(P.jumps<2){P.vy=P.jumps===1?-9:-10.8;P.onGround=false;P.jumps++;spawnDust(P.x+P.w/2,P.y+P.h);}};
+  document.getElementById('bj').addEventListener('touchstart',e=>{e.preventDefault();jump();},{passive:false});
+  document.getElementById('bj').addEventListener('click',jump);
+  document.getElementById('bi').addEventListener('touchstart',e=>{e.preventDefault();if(nearObj)interact(nearObj);},{passive:false});
+  document.getElementById('bi').addEventListener('click',()=>{if(nearObj)interact(nearObj);});
+})();
+
+function startGame(){running=true;document.getElementById('ss').classList.add('hidden');}
+window.startGame=startGame;
+
+function interact(obj){
+  if(!obj)return;
+  const z=ZONES.find(z=>z.id===obj.zone);
+  setPanel(z?z.name:'',obj.fn(),true);
+}
+
+function setPanel(zone,html){
+  const body=document.getElementById('pbody');
+  document.getElementById('pzone').textContent=zone||'—';
+  body.classList.remove('pv');void body.offsetWidth;
+  body.innerHTML=html;
+  setTimeout(()=>body.classList.add('pv'),30);
+}
+
+// ═══ PHYSICS ══════════════════════════════════════════
+function updatePlayer(){
+  if(!running)return;
+  P.sprinting=K['ShiftLeft']||K['ShiftRight'];
+  const spd=P.sprinting?5.5:3.2;
+  let mv=false;
+  if(K['ArrowLeft']||K['KeyA']){P.vx=-spd;P.facing=-1;mv=true;}
+  else if(K['ArrowRight']||K['KeyD']){P.vx=spd;P.facing=1;mv=true;}
+  else P.vx=0;
+  P.walking=mv&&P.onGround;
+  if(P.walking)P.frame++;
+  P.prevVy=P.vy;
+  P.vy+=0.62;P.x+=P.vx;P.y+=P.vy;
+  P.x=Math.max(0,Math.min(WW-P.w,P.x));
+  const wasInAir=!P.onGround;
+  P.onGround=false;
+
+  // Ground
+  if(P.y+P.h>=GY){
+    if(wasInAir&&P.prevVy>4)spawnDust(P.x+P.w/2,GY);
+    P.y=GY-P.h;P.vy=0;P.onGround=true;P.jumps=0;
+  }
+
+  // Static platforms
+  for(const pl of PLATS){
+    if(P.x+P.w>pl.x+2&&P.x<pl.x+pl.w-2&&P.y+P.h>pl.y&&P.y+P.h<pl.y+pl.h+12&&P.vy>=0){
+      if(wasInAir&&P.prevVy>4)spawnDust(P.x+P.w/2,pl.y);
+      P.y=pl.y-P.h;P.vy=0;P.onGround=true;P.jumps=0;
+    }
+  }
+
+  // Moving platform
+  if(P.x+P.w>movPlat.x+2&&P.x<movPlat.x+movPlat.w-2&&P.y+P.h>movPlat.y&&P.y+P.h<movPlat.y+movPlat.h+12&&P.vy>=0){
+    if(wasInAir&&P.prevVy>4)spawnDust(P.x+P.w/2,movPlat.y);
+    P.y=movPlat.y-P.h;P.vy=0;P.onGround=true;P.jumps=0;
+    P.x+=movPlat.dir*movPlat.spd; // ride platform
+  }
+
+  // Springs
+  for(const sp of SPRINGS){
+    if(P.x+P.w>sp.x+2&&P.x<sp.x+sp.w-2&&P.y+P.h>=sp.y&&P.y+P.h<sp.y+sp.h+10&&P.vy>=0){
+      P.vy=-19;P.onGround=false;P.jumps=0;
+      spawnParts(P.x+P.w/2,sp.y,'#c9682a',8);
+    }
+  }
+
+  // Sprint trail
+  if(P.sprinting&&mv&&Math.random()>.5){
+    PARTS.push({x:P.x+(P.facing>0?0:P.w),y:P.y+P.h*.6,vx:-P.facing*.8,vy:(Math.random()-.5)*.5,life:.4,decay:.08,r:1.5,col:'rgba(201,104,42,.4)',ch:'·'});
+  }
+}
+
+function updateCamera(){
+  CAM.x+=(P.x-(VW/2.8)-CAM.x)*0.12;
+  CAM.x=Math.max(0,Math.min(WW-VW,CAM.x));
+}
+
+function updateMovPlat(){
+  movPlat.x+=movPlat.dir*movPlat.spd;
+  if(movPlat.x>=movPlat.maxX||movPlat.x<=movPlat.minX)movPlat.dir*=-1;
+}
+
+function updateZone(){
+  const z=ZONES.find(z=>P.x+P.w/2>=z.x&&P.x+P.w/2<z.x+z.w)||ZONES[0];
+  if(z!==curZone){curZone=z;setPanel(z.name,zoneHTML(z.id));triggerZoneAnnouncement(z);}
+}
+
+function updateNear(){
+  let cl=null,md=62;
+  for(const obj of OBJECTS){
+    const d=Math.hypot(obj.x+obj.w/2-(P.x+P.w/2),obj.y+obj.h/2-(P.y+P.h/2));
+    if(d<md){md=d;cl=obj;}
+  }
+  nearObj=cl;
+  const h=document.getElementById('hint');
+  if(cl){h.textContent='[E] '+cl.label;h.classList.add('show');}
+  else h.classList.remove('show');
+}
+
+function updateParts(){
+  for(let i=PARTS.length-1;i>=0;i--){
+    const p=PARTS[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.life-=p.decay;
+    if(p.life<=0)PARTS.splice(i,1);
+  }
+}
+
+// ═══ BG STARS ═════════════════════════════════════════
+const STARS=[];
+for(let i=0;i<60;i++)STARS.push({wx:Math.random()*WW,y:Math.random()*(GY-60),r:Math.random()*1.3+.3,spd:Math.random()*.45+.1,flicker:Math.random()*100});
+
+function lerpH(a,b,t){
+  const p=s=>parseInt(s,16);
+  const r=(x,y)=>('0'+Math.round(p(x)+(p(y)-p(x))*t).toString(16)).slice(-2);
+  const h1=a.replace('#',''),h2=b.replace('#','');
+  return '#'+r(h1.slice(0,2),h2.slice(0,2))+r(h1.slice(2,4),h2.slice(2,4))+r(h1.slice(4,6),h2.slice(4,6));
+}
+function getBlend(){
+  const px=P.x+P.w/2;
+  let zi=ZONES.findIndex(z=>px>=z.x&&px<z.x+z.w);if(zi<0)zi=0;
+  const z=ZONES[zi],nz=ZONES[Math.min(zi+1,ZONES.length-1)];
+  const t=Math.max(0,Math.min(1,(px-(z.x+z.w*.65))/(z.w*.35)));
+  return{sky1:lerpH(z.sky1,nz.sky1,t),sky2:lerpH(z.sky2,nz.sky2,t),floor:lerpH(z.floor,nz.floor,t),acc:z.acc};
+}
+const wx=x=>x-CAM.x;
+const iv=(x,w)=>x-CAM.x>-w&&x-CAM.x<VW+w;
+
+// ═══ DRAW BACKGROUND ══════════════════════════════════
+function drawBG(bl){
+  const g=ctx.createLinearGradient(0,0,0,GY);
+  g.addColorStop(0,bl.sky1);g.addColorStop(1,bl.sky2);
+  ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
+  const t=Date.now();
+  STARS.forEach(s=>{
+    const sx=((s.wx-CAM.x*s.spd*.5)%VW+VW)%VW;
+    const f=Math.sin(t*.001+s.flicker)*.3+.7;
+    ctx.beginPath();ctx.arc(sx,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(220,210,185,${.12*f})`;ctx.fill();
+  });
+  ctx.fillStyle=bl.floor;ctx.fillRect(0,GY,VW,VH-GY);
+  ctx.fillStyle=bl.acc;ctx.fillRect(0,GY,VW,2);
+  // Ground dashes
+  ctx.fillStyle='rgba(255,255,255,0.04)';
+  const dOff=(CAM.x*.5)%40;
+  for(let x=-dOff;x<VW;x+=40){ctx.fillRect(x,GY+15,18,1);ctx.fillRect(x+4,GY+26,12,1);}
+}
+
+// ═══ DRAW DECORATIONS ════════════════════════════════
+function drawDeco(){
+  const t=Date.now();
+
+  /* HOME */
+  if(iv(0,600)){
+    ctx.save();ctx.globalAlpha=.05;ctx.fillStyle='#c9682a';
+    ctx.font='bold 78px "Space Mono"';ctx.fillText('TAMARA',wx(18),GY-85);ctx.restore();
+    // Floating data points in background
+    [90,185,350,455].forEach((ox,i)=>{
+      if(!iv(ox,20))return;
+      const oy=GY-130+Math.sin(t*.0012+i)*22;
+      ctx.beginPath();ctx.arc(wx(ox),oy,3+i%2*2,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,104,42,${.14+.04*i})`;ctx.fill();
+      ctx.strokeStyle=`rgba(201,104,42,.07)`;ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(wx(ox),oy,10+i*3,0,Math.PI*2);ctx.stroke();
+    });
+    if(iv(197,44)){
+      ctx.fillStyle='#6a4220';ctx.fillRect(wx(211),GY-62,4,52);
+      ctx.fillStyle='#c9a050';ctx.fillRect(wx(193),GY-60,42,20);
+      ctx.fillStyle='#1a0e06';ctx.font='8px "Press Start 2P"';ctx.fillText('INICIO',wx(196),GY-46);
+    }
+  }
+
+  /* ABOUT */
+  if(iv(520,600)){
+    const g2=ctx.createRadialGradient(wx(720),GY-60,10,wx(720),GY-60,140);
+    g2.addColorStop(0,'rgba(90,181,110,.05)');g2.addColorStop(1,'transparent');
+    ctx.fillStyle=g2;ctx.fillRect(0,0,VW,VH);
+    // Plant near bookshelf
+    if(iv(818,42)){
+      ctx.fillStyle='#2a4a18';ctx.fillRect(wx(826),GY-26,8,16);
+      [[wx(818),GY-52],[wx(828),GY-56],[wx(814),GY-46]].forEach(([lx,ly])=>{
+        ctx.beginPath();ctx.ellipse(lx,ly+Math.sin(t*.001)*2,8,5,-.3,0,Math.PI*2);
+        ctx.fillStyle='#3a8a28';ctx.fill();
+      });
+    }
+    // Desk (laptop) — sits ON T1 platform at y:GY-58
+    const DY1=GY-58; // T1 top
+    if(iv(574,80)){
+      ctx.fillStyle='#5a3a1a';ctx.fillRect(wx(574),DY1-10,58,10); // table top flush with plat
+      ctx.fillRect(wx(578),DY1,6,16);ctx.fillRect(wx(624),DY1,6,16);
+      ctx.fillStyle='#2a1a0a';ctx.fillRect(wx(588),DY1-46,32,38);
+      ctx.fillStyle='#0a1a08';ctx.fillRect(wx(590),DY1-44,28,32);
+      ctx.fillStyle='rgba(90,181,110,.5)';ctx.fillRect(wx(592),DY1-42,24,4);
+      ctx.fillStyle='rgba(90,181,110,.3)';
+      ctx.fillRect(wx(592),DY1-36,16,3);ctx.fillRect(wx(592),DY1-31,20,3);ctx.fillRect(wx(592),DY1-26,12,3);
+      ctx.fillStyle='#3a2a1a';ctx.fillRect(wx(602),DY1-9,4,9);
+    }
+    // Bookshelf — sits ON T2 platform at y:GY-112
+    const DY2=GY-112;
+    if(iv(716,64)){
+      ctx.fillStyle='#6a4a2a';
+      ctx.fillRect(wx(716),DY2-56,50,10);ctx.fillRect(wx(716),DY2-30,50,8);ctx.fillRect(wx(716),DY2-6,50,8);
+      ['#c9682a','#5ab56e','#4a9fd4','#b06cd0','#d4a84a'].forEach((c,i)=>{
+        ctx.fillStyle=c;ctx.fillRect(wx(718+i*9),DY2-54,7,26);
+      });
+    }
+  }
+
+  /* EXP — three office doors */
+  if(iv(1040,600)){
+    // Subtle grid
+    ctx.strokeStyle='rgba(74,143,212,.04)';ctx.lineWidth=1;
+    for(let x=wx(1040);x<wx(1560);x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,GY);ctx.stroke();}
+    // Doors — each one is taller/higher as you go up
+    // Christel: ground x:1058, Biblioteca: T1 x:1120, VSP: T2 x:1255
+    const expTiers=[[1058,GY,'#3a6aa0','CHMX',60],[1128,GY-58,'#4a8fd4','BIB ',70],[1263,GY-112,'#4a9fd4','VSP',75]];
+    expTiers.forEach(([ox,baseY,c,lbl,doorH])=>{
+      if(!iv(ox,62))return;
+      const rr=parseInt(c.slice(1,3),16),gg=parseInt(c.slice(3,5),16),bb=parseInt(c.slice(5,7),16);
+      ctx.fillStyle=`rgba(${rr},${gg},${bb},.14)`;ctx.fillRect(wx(ox-2),baseY-doorH,58,doorH);
+      ctx.strokeStyle=c;ctx.lineWidth=1;ctx.strokeRect(wx(ox-2),baseY-doorH,58,doorH);
+      ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(wx(ox+8),baseY-doorH+8,16,doorH-16);
+      ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(wx(ox+28),baseY-doorH+8,16,doorH-16);
+      ctx.fillStyle='#c9a050';ctx.beginPath();ctx.arc(wx(ox+40),baseY-doorH*.4,2,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=c;ctx.font='8px "Press Start 2P"';ctx.fillText(lbl,wx(ox+4),baseY-doorH-4);
+    });
+    // Moving platform indicator
+    if(iv(movPlat.x,movPlat.w+5)){
+      ctx.fillStyle='#0a1628';ctx.fillRect(wx(movPlat.x),movPlat.y,movPlat.w,movPlat.h+2);
+      ctx.fillStyle='#4a8fd4';ctx.fillRect(wx(movPlat.x),movPlat.y,movPlat.w,2);
+      // Arrow showing direction
+      ctx.fillStyle='rgba(74,143,212,.3)';ctx.font='8px serif';
+      ctx.fillText(movPlat.dir>0?'→':'←',wx(movPlat.x+movPlat.w/2-4),movPlat.y-4);
+    }
+  }
+
+  /* PROJECTS — buildings */
+  if(iv(1560,600)){
+    // Buildings at their tier heights — get taller going right
+    [[1618,'#b06cd0',GY-58, 66,'proj_bib'],[1758,'#9050c0',GY-112,80,'proj_sports'],[1918,'#d4844a',GY-162,68,'skills']].forEach(([ox,c,baseY,bldH,lbl],i)=>{
+      if(!iv(ox,62))return;
+      const rr=parseInt(c.slice(1,3),16),gg=parseInt(c.slice(3,5),16),bb=parseInt(c.slice(5,7),16);
+      ctx.fillStyle=`rgba(${rr},${gg},${bb},.14)`;ctx.fillRect(wx(ox-2),baseY-bldH,62,bldH);
+      ctx.strokeStyle=c;ctx.lineWidth=1;ctx.strokeRect(wx(ox-2),baseY-bldH,62,bldH);
+      const wy1=baseY-bldH+8,wy2=baseY-bldH+22;
+      [[ox+3,wy1],[ox+30,wy1],[ox+3,wy2],[ox+30,wy2]].forEach(([dx,dy])=>{
+        ctx.globalAlpha=.32+.18*Math.sin(t*.002+i*1.8+dx);
+        ctx.fillStyle=c;ctx.fillRect(wx(dx),dy,18,10);
+      });
+      ctx.globalAlpha=1;
+      ctx.fillStyle=c;ctx.font='8px "Press Start 2P"';ctx.fillText(lbl,wx(ox+2),baseY-bldH-4);
+    });
+    // Floating data symbols
+    ['Python','SQL','R','Looker'].forEach((sym,i)=>{
+      const ox=1620+i*110, oy=GY-160+Math.sin(t*.0015+i)*14;
+      if(!iv(ox,50))return;
+      ctx.fillStyle='rgba(176,108,208,.18)';ctx.font='8px "Space Mono"';
+      ctx.fillText(sym,wx(ox),oy);
+    });
+  }
+
+  /* CONTACT */
+  if(iv(2080,600)){
+    const sg=ctx.createLinearGradient(0,GY-100,0,GY);
+    sg.addColorStop(0,'rgba(201,104,42,0)');sg.addColorStop(1,'rgba(201,104,42,.06)');
+    ctx.fillStyle=sg;ctx.fillRect(0,0,VW,VH);
+    // Mailbox: ground level
+    if(iv(2090,52)){
+      ctx.fillStyle='#7a2a18';ctx.fillRect(wx(2094),GY-62,44,44);
+      ctx.fillStyle='#c9682a';ctx.fillRect(wx(2094),GY-62,44,18);
+      ctx.fillStyle='#2a0808';ctx.fillRect(wx(2100),GY-56,30,4);
+      ctx.fillStyle='#6a2a10';ctx.fillRect(wx(2112),GY-20,8,20);
+    }
+    // GitHub sign: ON T1 platform (GY-62 top)
+    const cT1=GY-62;
+    if(iv(2204,52)){
+      ctx.fillStyle='#1a1a2a';ctx.fillRect(wx(2208),cT1-52,44,50);
+      ctx.strokeStyle='#c9682a';ctx.lineWidth=1;ctx.strokeRect(wx(2208),cT1-52,44,50);
+      ctx.fillStyle='rgba(201,104,42,.7)';ctx.font='9px serif';ctx.fillText('@',wx(2222),cT1-22);
+      ctx.fillStyle='rgba(201,104,42,.4)';ctx.font='8px "Press Start 2P"';ctx.fillText('GITHUB',wx(2210),cT1-38);
+    }
+    // Door: ON T2 platform (GY-118 top)
+    const cT2=GY-118;
+    if(iv(2334,52)){
+      ctx.fillStyle='#5a2a10';ctx.fillRect(wx(2338),cT2-82,46,82);
+      ctx.fillStyle='#3a1808';ctx.fillRect(wx(2340),cT2-80,42,80);
+      [[2344,cT2-72],[2364,cT2-72],[2344,cT2-52],[2364,cT2-52]].forEach(([dx,dy])=>{
+        ctx.fillStyle='rgba(201,104,42,.2)';ctx.fillRect(wx(dx),dy,14,14);
+        ctx.strokeStyle='rgba(201,104,42,.4)';ctx.lineWidth=1;ctx.strokeRect(wx(dx),dy,14,14);
+      });
+      ctx.fillStyle='#f0a060';ctx.beginPath();ctx.arc(wx(2374),cT2-38,3,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(201,104,42,.45)';ctx.font='8px "Press Start 2P"';ctx.fillText('OPEN',wx(2343),cT2-86);
+    }
+    // Path lights
+    [2118,2158,2198,2238,2278,2318,2358,2398,2438,2478].forEach(lx=>{
+      if(!iv(lx,10))return;
+      const lg=ctx.createRadialGradient(wx(lx),GY,0,wx(lx),GY,14);
+      lg.addColorStop(0,'rgba(201,104,42,.22)');lg.addColorStop(1,'transparent');
+      ctx.fillStyle=lg;ctx.fillRect(wx(lx)-14,GY-14,28,14);
+      ctx.fillStyle='rgba(201,104,42,.45)';ctx.fillRect(wx(lx)-2,GY-4,4,4);
+    });
+  }
+}
+
+// ═══ ZONE BANNER — permanente, se actualiza al cambiar zona ═
+const ZA = { alpha:0, zone:null };
+
+function triggerZoneAnnouncement(zone){
+  ZA.zone = zone;
+  ZA.alpha = 0; // reset para fade-in
+}
+
+function updateZoneAnnouncement(){
+  if(ZA.zone && ZA.alpha < 1) ZA.alpha = Math.min(1, ZA.alpha + 0.06);
+}
+
+const ZONE_LINES = {
+  home:     ['Bienvenida al portfolio'],
+  about:    ['[x1] Computadora — Sobre mi','[x2] Libreria — ITAM, WU Wien, UDS'],
+  exp:      ['[suelo] Christel House A.C.','[x1] Biblioteca Jose Marti','[x2] VSP Soluciones Tecnologicas'],
+  projects: ['[x1] Proyecto Biblioteca','[x2] Sports Analytics Lab — ITAM','[x3] Skills, Tools e Idiomas'],
+  contact:  ['[suelo] Buzon de correo','[x1] GitHub @tamaraschnaas','[x2] La puerta siempre abierta'],
+};
+
+function drawZoneAnnouncement(){
+  if(!ZA.zone || ZA.alpha <= 0) return;
+  const z = ZA.zone;
+  const lines = ZONE_LINES[z.id] || [];
+  const rr=parseInt(z.acc.slice(1,3),16),gg=parseInt(z.acc.slice(3,5),16),bb=parseInt(z.acc.slice(5,7),16);
+
+  const bw = 400, bh = 32 + lines.length * 20;
+  const bx = (VW - bw) / 2, by = 50;
+
+  ctx.save();
+  ctx.globalAlpha = ZA.alpha;
+
+  ctx.fillStyle = 'rgba(6,5,3,.96)';
+  ctx.fillRect(bx, by, bw, bh);
+  ctx.fillStyle = `rgb(${rr},${gg},${bb})`;
+  ctx.fillRect(bx, by, 4, bh);
+  ctx.strokeStyle = `rgba(${rr},${gg},${bb},.7)`;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(bx, by, bw, bh);
+
+  ctx.fillStyle = `rgb(${rr},${gg},${bb})`;
+  ctx.font = 'bold 11px "Press Start 2P"';
+  ctx.fillText(z.name, bx + 16, by + 22);
+
+  lines.forEach((ln, i) => {
+    ctx.fillStyle = 'rgba(240,232,218,.92)';
+    ctx.font = '7px "Press Start 2P"';
+    ctx.fillText(ln, bx + 16, by + 36 + i * 20);
+  });
+
+  ctx.restore();
+}
+
+// ═══ DRAW PLATFORMS & SPRINGS ════════════════════════
+function drawPlatforms(){
+  PLATS.forEach(pl=>{
+    if(!iv(pl.x,pl.w))return;
+    const z=ZONES.find(z=>P.x+P.w/2>=z.x&&P.x+P.w/2<z.x+z.w)||ZONES[0];
+    ctx.fillStyle=z.floor;ctx.fillRect(wx(pl.x),pl.y,pl.w,pl.h+2);
+    ctx.fillStyle=z.acc;ctx.fillRect(wx(pl.x),pl.y,pl.w,2);
+  });
+  SPRINGS.forEach(sp=>{
+    if(!iv(sp.x,sp.w))return;
+    const t=Date.now();
+    const bounce=Math.abs(Math.sin(t*.004))*3;
+    ctx.fillStyle='#c9682a';
+    ctx.fillRect(wx(sp.x),sp.y+bounce,sp.w,sp.h-bounce);
+    // Coil lines
+    ctx.fillStyle='rgba(255,200,100,.7)';
+    ctx.fillRect(wx(sp.x+4),sp.y+2+bounce,4,4);
+    ctx.fillRect(wx(sp.x+12),sp.y+2+bounce,4,4);
+    ctx.fillRect(wx(sp.x+20),sp.y+2+bounce,4,4);
+    // Arrow up
+    ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='8px serif';
+    ctx.fillText('↑',wx(sp.x+sp.w/2-4),sp.y-2);
+  });
+}
+
+// ═══ DRAW OBJECTS ════════════════════════════════════
+function drawObjects(){
+  const t=Date.now();
+  const iconMap={
+    welcome:'📋',desk_about:'💻',books_edu:'📚',
+    exp_vsp:'📊',exp_bib:'📖',exp_christel:'🖥️',
+    proj_sports:'🏟',proj_bib:'📖',skills_all:'🛠️',
+    mailbox:'📬',gh_sign:'🐙',door:'🚪'
+  };
+  OBJECTS.forEach(obj=>{
+    if(!iv(obj.x,obj.w+22))return;
+    const near=nearObj===obj;
+    const z=ZONES.find(z=>z.id===obj.zone)||ZONES[0];
+    if(near){
+      const p2=.18+.14*Math.sin(t*.006);
+      const rr=parseInt(z.acc.slice(1,3),16),gg=parseInt(z.acc.slice(3,5),16),bb=parseInt(z.acc.slice(5,7),16);
+      const gl=ctx.createRadialGradient(wx(obj.x+obj.w/2),obj.y+obj.h/2,0,wx(obj.x+obj.w/2),obj.y+obj.h/2,44);
+      gl.addColorStop(0,`rgba(${rr},${gg},${bb},${p2})`);gl.addColorStop(1,'transparent');
+      ctx.fillStyle=gl;ctx.fillRect(wx(obj.x-26),obj.y-26,obj.w+52,obj.h+52);
+    }
+    const ico=iconMap[obj.id]||'?';
+    ctx.font='18px serif';ctx.fillText(ico,wx(obj.x+obj.w/2-9),obj.y+obj.h/2+6);
+  });
+}
+
+// ═══ DRAW PLAYER ════════════════════════════════════
+function drawPlayer(){
+  const px=wx(P.x),py=P.y,f=P.frame,fl=P.facing;
+  // Shadow
+  ctx.globalAlpha=.18;ctx.fillStyle='#000';
+  ctx.beginPath();ctx.ellipse(px+P.w/2,GY+2,P.w*.7,4,0,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  ctx.save();
+  if(fl<0){ctx.translate(px+P.w,0);ctx.scale(-1,1);}else{ctx.translate(px,0);}
+  const l1=P.walking?Math.sin(f*.22)*5:0,l2=P.walking?-Math.sin(f*.22)*5:0;
+  const a1=P.walking?Math.sin(f*.22)*4:0,a2=P.walking?-Math.sin(f*.22)*4:0;
+  const bb=P.walking?Math.abs(Math.sin(f*.22))*-1.5:0;
+  // Second jump flash
+  if(!P.onGround&&P.jumps===2){
+    ctx.fillStyle='rgba(201,104,42,.15)';ctx.fillRect(-6,py+bb,P.w+12,P.h);
+  }
+  ctx.fillStyle='#2a1a0a';ctx.fillRect(0,py+26+l1,7,4);ctx.fillRect(8,py+26+l2,7,4);
+  ctx.fillStyle='#3a4a6a';ctx.fillRect(1,py+18+bb,5,12+l1);ctx.fillRect(9,py+18+bb,5,12+l2);
+  ctx.fillStyle='#e8ddd0';ctx.fillRect(0,py+8+bb,P.w,12);
+  ctx.fillStyle=P.sprinting?'#e07030':'#c9682a';ctx.fillRect(4,py+8+bb,6,3);
+  ctx.fillStyle='#f0c8a0';ctx.fillRect(-4,py+9+bb+a1,4,9);ctx.fillRect(14,py+9+bb+a2,4,9);
+  ctx.fillStyle='#f0c8a0';ctx.fillRect(1,py+bb,12,10);
+  ctx.fillStyle='#2a1a0a';ctx.fillRect(1,py+bb,12,4);ctx.fillRect(1,py+bb,2,7);
+  ctx.fillStyle='#1a0a0a';ctx.fillRect(8,py+5+bb,2,2);
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.fillRect(9,py+5+bb,1,1);
+  ctx.restore();
+}
+
+// ═══ DRAW PARTICLES ══════════════════════════════════
+function drawParts(){
+  PARTS.forEach(p=>{
+    ctx.globalAlpha=p.life*.9;
+    ctx.fillStyle=p.col;
+    if(p.ch&&p.ch!=='·'){
+      ctx.font=p.r*3+'px serif';
+      ctx.fillText(p.ch,p.x-p.r,p.y+p.r);
+    } else {
+      ctx.fillRect(p.x-p.r/2,p.y-p.r/2,p.r,p.r);
+    }
+  });
+  ctx.globalAlpha=1;
+}
+
+// ═══ DRAW HUD ══════════════════════════════════════
+function drawHUD(){
+  if(!running)return;
+  const mw=220,mh=12,mx=(VW-mw)/2,my=10;
+
+  // Minimap background
+  ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(mx-3,my-3,mw+6,mh+6);
+  ZONES.forEach(z=>{
+    const zx=mx+(z.x/WW)*mw,zw=(z.w/WW)*mw;
+    const rr=parseInt(z.acc.slice(1,3),16),gg=parseInt(z.acc.slice(3,5),16),bb=parseInt(z.acc.slice(5,7),16);
+    ctx.fillStyle=`rgba(${rr},${gg},${bb},.35)`;ctx.fillRect(zx,my,zw,mh);
+    ctx.strokeStyle=`rgba(${rr},${gg},${bb},.5)`;ctx.lineWidth=1;ctx.strokeRect(zx,my,zw,mh);
+  });
+  // Player dot
+  ctx.fillStyle='#fff';ctx.fillRect(mx+(P.x/WW)*mw-2,my,4,mh);
+
+  // Zone name label — bigger box, bigger font
+  if(curZone){
+    ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillRect(mx-3,my+mh+4,mw+6,20);
+    ctx.strokeStyle=curZone.acc;ctx.lineWidth=1;ctx.strokeRect(mx-3,my+mh+4,mw+6,20);
+    ctx.fillStyle=curZone.acc;ctx.font='bold 9px "Press Start 2P"';
+    ctx.textAlign='center';ctx.fillText(curZone.name,mx+mw/2,my+mh+18);ctx.textAlign='left';
+  }
+
+  // Double jump indicator
+  if(!P.onGround){
+    ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(8,my-3,90,22);
+    ctx.strokeStyle=P.jumps<2?'#c9682a':'rgba(201,104,42,.3)';ctx.lineWidth=1;
+    ctx.strokeRect(8,my-3,90,22);
+    ctx.fillStyle=P.jumps<2?'#c9682a':'rgba(201,104,42,.4)';
+    ctx.font='bold 8px "Press Start 2P"';
+    ctx.fillText('SALTO '+(2-P.jumps)+'x', 14, my+12);
+  }
+}
+
+// ═══ MAIN LOOP ════════════════════════════════════════
+function loop(){
+  updatePlayer();updateCamera();updateMovPlat();updateZone();updateNear();updateParts();updateZoneAnnouncement();
+  const bl=getBlend();
+  drawBG(bl);
+  ZONES.slice(1).forEach(z=>{const bx=wx(z.x);if(bx>-4&&bx<VW+4){ctx.fillStyle='rgba(255,255,255,.025)';ctx.fillRect(bx,0,1,GY);}});
+  drawDeco();drawPlatforms();drawObjects();drawParts();drawPlayer();drawHUD();drawZoneAnnouncement();
+  requestAnimationFrame(loop);
+}
+loop();
+
+setPanel('N.° 001 — TARJETA PERSONAL',`
+  <div class="pbody" style="opacity:1">
+    <p style="margin-bottom:.7rem;font-family:var(--ff-s);font-size:1.1rem;font-style:italic;color:var(--text)">Tamara Terroba Schnaas</p>
+    <p style="font-size:10px;margin-bottom:.8rem">Data Science · ITAM · CDMX</p>
+    <div class="phint">
+      ← → MOVER · SHIFT CORRER RÁPIDO<br>
+      ↑ / SPC SALTAR (DOBLE SALTO OK!)<br>
+      ◉ TRAMPOLINES = SUPER SALTO<br>
+      E INTERACTUAR CON OBJETOS<br><br>
+      E INTERACTUAR CON OBJETOS
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>
