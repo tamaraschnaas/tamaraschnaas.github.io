@@ -101,7 +101,7 @@
     'FN:Tamara Terroba Schnaas',
     'N:Terroba Schnaas;Tamara;;;',
     'EMAIL;TYPE=INTERNET:tamaschnaas@gmail.com',
-    'TEL;TYPE=CELL:+525548286573',
+  
     'ADR;TYPE=HOME:;;Mexico City;;;;Mexico',
     'URL:https://github.com/tamaraschnaas',
     'NOTE:Data Science · ITAM',
